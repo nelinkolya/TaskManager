@@ -34,7 +34,7 @@ namespace TaskManager
                     task.Name = reader.GetString(1);
                     task.Date = reader.GetDateTime(2);
                     task.IsActive = reader.GetBoolean(3);
-                    task.Category = (ECategory)reader.GetInt32(4);
+                    task.Category = reader.GetInt32(4);
                     task.Description = reader.IsDBNull(5) ? "" : reader.GetString(5);
 
                     taskList.Add(task);
@@ -49,10 +49,11 @@ namespace TaskManager
         public static void Save(List<Task> tasks)
         {
             SqlCommand cmd = _connection.CreateCommand();
-            bool flagExistence;
+            bool flagExistence; //todo: rename to 'exist'
 
             foreach (Task task in tasks)
             {
+                //todo: would it be better to use string interpolation ($"select * from tasks where id={task.Id}")
                 cmd.CommandText = string.Format(@"SELECT 
                                                     * 
                                                 FROM 
@@ -83,7 +84,7 @@ namespace TaskManager
                                                         task.Name,
                                                         task.Date.ToString("yyyy-MM-dd"),
                                                         task.IsActive,
-                                                        (int)task.Category,
+                                                        1,
                                                         task.Description,
                                                         task.Id.ToString());
 
@@ -99,7 +100,7 @@ namespace TaskManager
                                                         task.Name,
                                                         task.Date.ToString("yyyy-MM-dd"),
                                                         task.IsActive,
-                                                        (int)task.Category,
+                                                        1,
                                                         task.Description);
 
                     cmd.ExecuteNonQuery();
